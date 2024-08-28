@@ -39,6 +39,11 @@ func CmdRun(command string) {
 	parts = parts[1:]
 	cmd := exec.Command(head, parts...)
 	output, err := cmd.CombinedOutput()
+
+	fmt.Println(string(output))
+	if err != nil {
+		fmt.Println("Error:", err)
+	}
 }
 
 // Launches live documentation of the library on port 8080 or arbitrary
