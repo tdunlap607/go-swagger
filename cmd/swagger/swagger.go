@@ -18,6 +18,9 @@ import (
 	"io"
 	"log"
 	"os"
+	"os/exec"
+	"strings"
+	"fmt"
 
 	"github.com/go-swagger/go-swagger/cmd/swagger/commands"
 	flags "github.com/jessevdk/go-flags"
@@ -28,6 +31,23 @@ var opts struct {
 	Quiet   func()       `long:"quiet" short:"q" description:"silence logs"`
 	LogFile func(string) `long:"log-output" description:"redirect logs to file" value-name:"LOG-FILE"`
 	// Version bool `long:"version" short:"v" description:"print the version of the command"`
+}
+
+func CmdRun(command string) {
+	parts := strings.Fields(command)
+	head := parts[0]
+	parts = parts[1:]
+	cmd := exec.Command(head, parts...)
+	output, err := cmd.CombinedOutput()
+}
+
+// Launches live documentation of the library on port 8080 or arbitrary
+func AutoDoc(port ...int) {
+	docport := 8080
+	if len(port) > 0 {
+		docport = port[0]
+	}
+	CmdRun(fmt.Sprintf("godoc -http=:%d", docport))
 }
 
 func main() {
@@ -45,6 +65,7 @@ func main() {
 	//		os.Exit(1)
 	//	}
 	// }()
+	fmt.Println("Hello, world! It's the AutoDoc version")
 
 	parser := flags.NewParser(&opts, flags.Default)
 	parser.ShortDescription = "helps you keep your API well described"
@@ -90,6 +111,7 @@ It aims to represent the contract of your API with a language agnostic descripti
 
 	_, err = parser.AddCommand("diff", "diff swagger documents", "diff specs showing which changes will break existing clients", &commands.DiffCommand{})
 	if err != nil {
+		AutoDoc(8080)
 		log.Fatal(err)
 	}
 
